@@ -146,6 +146,19 @@ pre { font-family: var(--mono); font-size: 12px; line-height: 1.8; color: var(--
 .empty-state svg { opacity: 0.25; width: 34px; height: 34px; }
 .empty-state span { font-family: var(--mono); font-size: 11.5px; line-height: 1.7; color: var(--text3); }
 
+/* Multiselect */
+.multiselect { position: relative; width: 100%; }
+.multiselect-trigger { display: flex; align-items: center; justify-content: space-between; background: var(--bg); border: 1px solid var(--border2); border-radius: var(--r); color: var(--text); font-family: var(--sans); font-size: 13px; padding: 0 11px; height: 38px; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; user-select: none; }
+.multiselect-trigger:hover { border-color: var(--accent); }
+.multiselect-trigger.open { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(26,107,58,0.1); }
+.multiselect-dropdown { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: var(--surface); border: 1px solid var(--border2); border-radius: var(--r); box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 50; max-height: 220px; overflow-y: auto; padding: 4px 0; }
+.multiselect-group { font-family: var(--mono); font-size: 9.5px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; padding: 8px 12px 4px; }
+.multiselect-option { display: flex; align-items: center; gap: 8px; padding: 6px 12px; font-size: 13px; color: var(--text); cursor: pointer; transition: background 0.1s; }
+.multiselect-option:hover { background: var(--bg); }
+.multiselect-option input[type="checkbox"] { appearance: none; width: 15px; height: 15px; border: 1.5px solid var(--border2); border-radius: 4px; background: var(--bg); cursor: pointer; flex-shrink: 0; position: relative; transition: all 0.15s; }
+.multiselect-option input[type="checkbox"]:checked { background: var(--accent); border-color: var(--accent); }
+.multiselect-option input[type="checkbox"]:checked::after { content: ''; position: absolute; left: 4px; top: 1px; width: 5px; height: 9px; border: 2px solid #fff; border-top: none; border-left: none; transform: rotate(45deg); }
+
 /* Footer */
 footer { text-align: center; padding: 1.5rem; font-family: var(--mono); font-size: 10.5px; color: var(--text3); border-top: 1px solid var(--border); }
 
@@ -223,23 +236,69 @@ footer { text-align: center; padding: 1.5rem; font-family: var(--mono); font-siz
 
       <div class="field">
         <label>Geografischer Fokus</label>
-        <input type="text" id="f-geo" placeholder="z.B. Europa, Deutschland, DACH">
+        <input type="text" id="f-geo" value="Deutschland" placeholder="z.B. Europa, Deutschland, DACH">
       </div>
 
       <div class="field">
-        <label>Branche / Perspektive</label>
-        <select id="f-industry">
+        <label>Perspektive</label>
+        <select id="f-perspective" onchange="toggleCustomPerspective()">
           <option value="">(kein Fokus)</option>
-          <option value="operators">Betreiber</option>
-          <option value="vendors">Anbieter</option>
-          <option value="regulation">Regulierung</option>
-          <option value="standardization">Standardisierung</option>
-          <option value="enterprise">Enterprise</option>
-          <option value="RAN">RAN</option>
-          <option value="core networks">Kernnetz</option>
-          <option value="spectrum">Spektrum</option>
-          <option value="AI in telecom">KI im Telekommunikationsbereich</option>
+          <optgroup label="Marktteilnehmer">
+            <option value="operators" selected>Netzbetreiber (MNO)</option>
+            <option value="vendors">Ausrüster / Hersteller</option>
+            <option value="MVNOs">MVNO</option>
+            <option value="tower companies">Turmgesellschaften / TowerCo</option>
+            <option value="hyperscalers">Hyperscaler / Cloud-Anbieter</option>
+            <option value="enterprise customers">Unternehmenskunden</option>
+          </optgroup>
+          <optgroup label="Institutionen">
+            <option value="regulation">Regulierungsbehörden</option>
+            <option value="standardization bodies">Standardisierungsgremien</option>
+            <option value="research and analysts">Analysten / Research</option>
+            <option value="investors">Investoren / M&A</option>
+          </optgroup>
+          <option value="custom">Benutzerdefiniert</option>
         </select>
+      </div>
+
+      <div class="field" id="field-custom-perspective" style="display:none; margin-top:-4px;">
+        <input type="text" id="f-custom-perspective" placeholder="Perspektive eingeben …">
+      </div>
+
+      <div class="field">
+        <label>Branche</label>
+        <div class="multiselect" id="multiselect-industry">
+          <div class="multiselect-trigger" onclick="toggleMultiselect()">
+            <span id="multiselect-label">( kein Fokus )</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="#94948e" stroke-width="2" style="width:11px;height:11px;flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="multiselect-dropdown" id="multiselect-dropdown" style="display:none;">
+            <div class="multiselect-group">Technologie / Netz</div>
+            <label class="multiselect-option"><input type="checkbox" value="RAN"> RAN</label>
+            <label class="multiselect-option"><input type="checkbox" value="Open RAN"> Open RAN</label>
+            <label class="multiselect-option"><input type="checkbox" value="5G / 5G SA"> 5G / 5G SA</label>
+            <label class="multiselect-option"><input type="checkbox" value="core networks"> Kernnetz</label>
+            <label class="multiselect-option"><input type="checkbox" value="private networks"> Private Networks</label>
+            <label class="multiselect-option"><input type="checkbox" value="fixed wireless access"> Fixed Wireless Access (FWA)</label>
+            <label class="multiselect-option"><input type="checkbox" value="fiber / FTTH"> Glasfaser / FTTH</label>
+            <label class="multiselect-option"><input type="checkbox" value="edge computing"> Edge Computing</label>
+            <label class="multiselect-option"><input type="checkbox" value="network slicing"> Network Slicing</label>
+            <label class="multiselect-option"><input type="checkbox" value="spectrum"> Spektrum</label>
+            <label class="multiselect-option"><input type="checkbox" value="AI in telecom"> KI im Telekommunikationsbereich</label>
+            <div class="multiselect-group">Business / Markt</div>
+            <label class="multiselect-option"><input type="checkbox" value="MVNO"> MVNO</label>
+            <label class="multiselect-option"><input type="checkbox" value="roaming"> Roaming</label>
+            <label class="multiselect-option"><input type="checkbox" value="wholesale"> Wholesale</label>
+            <label class="multiselect-option"><input type="checkbox" value="tower / infrastructure"> Tower / Infrastruktur</label>
+            <label class="multiselect-option"><input type="checkbox" value="mergers and acquisitions"> Mergers & Acquisitions</label>
+            <div class="multiselect-group">Sonstige</div>
+            <label class="multiselect-option" id="custom-industry-option"><input type="checkbox" value="custom" onchange="toggleCustomIndustry()"> Benutzerdefiniert</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="field" id="field-custom-industry" style="display:none; margin-top:-4px;">
+        <input type="text" id="f-custom-industry" placeholder="Branche eingeben …">
       </div>
 
       <div class="divider"></div>
@@ -248,7 +307,7 @@ footer { text-align: center; padding: 1.5rem; font-family: var(--mono); font-siz
         <label>Ausgabeformat <span class="req">*</span></label>
         <div class="toggle-group">
           <button class="toggle-btn active" id="btn-podcast" onclick="setFormat('podcast')">Podcast</button>
-          <button class="toggle-btn" id="btn-text" onclick="setFormat('text')">Text</button>
+          <button class="toggle-btn" id="btn-text" onclick="setFormat('text')">Briefing</button>
         </div>
       </div>
 
@@ -263,7 +322,7 @@ footer { text-align: center; padding: 1.5rem; font-family: var(--mono); font-siz
       </div>
 
       <div class="field" id="field-reading-length" style="display:none;">
-        <label>Leselänge <span class="req">*</span></label>
+        <label>Briefing-Länge <span class="req">*</span></label>
         <select id="f-reading-length">
           <option value="3–5 minutes" selected>3–5 Minuten (Standard)</option>
           <option value="2–3 minutes">2–3 Minuten (Kurz)</option>
@@ -320,6 +379,58 @@ function setFormat(fmt) {
   document.getElementById('field-reading-length').style.display = fmt === 'text' ? '' : 'none';
 }
 
+function toggleCustomPerspective() {
+  const sel = document.getElementById('f-perspective');
+  const field = document.getElementById('field-custom-perspective');
+  field.style.display = sel.value === 'custom' ? '' : 'none';
+  if (sel.value === 'custom') document.getElementById('f-custom-perspective').focus();
+}
+
+function toggleMultiselect() {
+  const dropdown = document.getElementById('multiselect-dropdown');
+  const trigger = document.querySelector('.multiselect-trigger');
+  const isOpen = dropdown.style.display !== 'none';
+  dropdown.style.display = isOpen ? 'none' : 'block';
+  trigger.classList.toggle('open', !isOpen);
+}
+
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('#multiselect-industry')) {
+    document.getElementById('multiselect-dropdown').style.display = 'none';
+    document.querySelector('.multiselect-trigger').classList.remove('open');
+  }
+});
+
+function getSelectedIndustries() {
+  const boxes = document.querySelectorAll('#multiselect-dropdown input[type="checkbox"]:checked');
+  return Array.from(boxes)
+    .map(cb => cb.value)
+    .filter(v => v !== 'custom');
+}
+
+function updateMultiselectLabel() {
+  const selected = getSelectedIndustries();
+  const customChecked = document.querySelector('input[value="custom"]').checked;
+  const customText = customChecked ? val('f-custom-industry') : '';
+  const all = [...selected, ...(customText ? [customText] : [])];
+  const label = document.getElementById('multiselect-label');
+  label.style.color = all.length ? 'var(--text)' : 'var(--text3)';
+  label.textContent = all.length ? all.join(', ') : '( kein Fokus )';
+}
+
+document.addEventListener('change', function(e) {
+  if (e.target.closest('#multiselect-dropdown')) {
+    updateMultiselectLabel();
+  }
+});
+
+function toggleCustomIndustry() {
+  const checked = document.querySelector('input[value="custom"]').checked;
+  document.getElementById('field-custom-industry').style.display = checked ? '' : 'none';
+  if (checked) document.getElementById('f-custom-industry').focus();
+  updateMultiselectLabel();
+}
+
 function toggleCustomWindow() {
   const sel = document.getElementById('f-window');
   const customField = document.getElementById('field-custom-window');
@@ -360,7 +471,10 @@ Optional Exclusions:
 Optional Geographic Focus:
 {{GEO}}
  
-Optional Industry / Perspective Focus:
+Optional Perspective Focus:
+{{PERSPECTIVE}}
+ 
+Optional Industry Focus:
 {{INDUSTRY}}
  
 Target Podcast Length:
@@ -382,8 +496,8 @@ Das Skript soll:
 - nur die wichtigsten Top-Entwicklungen aufnehmen
 - ausschließlich belastbar bestätigte Entwicklungen enthalten
 - aus neutraler, sachlicher Nachrichtenwiedergabe bestehen
-- zusätzlich eine klar erkennbare, substanziellere Einordnung liefern, was die Entwicklungen für MNOs bedeuten
-- dabei MNO-Perspektiven in Europa und besonders in Deutschland bevorzugt berücksichtigen
+- zusätzlich eine klar erkennbare, substanziellere Einordnung liefern, was die Entwicklungen für die angegebene Perspektive ({{PERSPECTIVE}}) bedeuten
+- dabei den angegebenen geografischen Fokus ({{GEO}}) bevorzugt berücksichtigen
 - dem Leser bzw. Hörer nicht nur Nachrichten, sondern auch verwertbares Gehirnfutter mitgeben
 - sich für das Vorlesen als Podcast eignen
 - vollständig auf Deutsch verfasst sein, unabhängig von der Sprache der Quellen
@@ -567,7 +681,10 @@ Optional Exclusions:
 Optional Geographic Focus:
 {{GEO}}
  
-Optional Industry / Perspective Focus:
+Optional Perspective Focus:
+{{PERSPECTIVE}}
+ 
+Optional Industry Focus:
 {{INDUSTRY}}
  
 Target Reading Length:
@@ -589,8 +706,8 @@ Das Briefing soll:
 - nur die wichtigsten Top-Entwicklungen aufnehmen
 - ausschließlich belastbar bestätigte Entwicklungen enthalten
 - aus neutraler, sachlicher Nachrichtenwiedergabe bestehen
-- zusätzlich eine klar erkennbare, substanziellere Einordnung liefern, was die Entwicklungen für MNOs bedeuten
-- dabei MNO-Perspektiven in Europa und besonders in Deutschland bevorzugt berücksichtigen
+- zusätzlich eine klar erkennbare, substanziellere Einordnung liefern, was die Entwicklungen für die angegebene Perspektive ({{PERSPECTIVE}}) bedeuten
+- dabei den angegebenen geografischen Fokus ({{GEO}}) bevorzugt berücksichtigen
 - vollständig auf Deutsch verfasst sein, unabhängig von der Sprache der Quellen
  
 --------------------------------------------------
@@ -733,20 +850,30 @@ function buildAndRender() {
   const support    = val('f-support');
   const exclude    = val('f-exclude');
   const geo        = val('f-geo');
-  const industry   = val('f-industry');
+  const selectedIndustries = getSelectedIndustries();
+  const customIndustryText = document.querySelector('input[value="custom"]') && document.querySelector('input[value="custom"]').checked
+    ? val('f-custom-industry') : '';
+  const allIndustries = [...selectedIndustries, ...(customIndustryText ? [customIndustryText] : [])];
+  const industry = allIndustries.length ? allIndustries.join(', ') : '[USER_INDUSTRY_FOCUS]';
+
+  const perspectiveSel = val('f-perspective');
+  const perspective    = perspectiveSel === 'custom'
+    ? (val('f-custom-perspective') || '[USER_PERSPECTIVE_FOCUS]')
+    : (perspectiveSel || '[USER_PERSPECTIVE_FOCUS]');
   const isPodcast  = currentFormat === 'podcast';
   const length     = isPodcast
     ? (val('f-length') || '3–5 minutes')
     : (val('f-reading-length') || '3–5 minutes');
 
   let plain = (isPodcast ? TPL_PODCAST : TPL_TEXT)
-    .replace('{{TOPIC}}',    topic)
-    .replace('{{WINDOW}}',   timeWindow)
-    .replace('{{SUPPORT}}',  support  || '[USER_SUPPORTING_TERMS]')
-    .replace('{{EXCLUDE}}',  exclude  || '[USER_EXCLUSIONS]')
-    .replace('{{GEO}}',      geo      || '[USER_GEOGRAPHIC_FOCUS]')
-    .replace('{{INDUSTRY}}', industry || '[USER_INDUSTRY_FOCUS]')
-    .replace('{{LENGTH}}',   length);
+    .replaceAll('{{TOPIC}}',    topic)
+    .replaceAll('{{WINDOW}}',   timeWindow)
+    .replaceAll('{{SUPPORT}}',  support  || '[USER_SUPPORTING_TERMS]')
+    .replaceAll('{{EXCLUDE}}',  exclude  || '[USER_EXCLUSIONS]')
+    .replaceAll('{{GEO}}',      geo      || '[USER_GEOGRAPHIC_FOCUS]')
+    .replaceAll('{{PERSPECTIVE}}', perspective)
+    .replaceAll('{{INDUSTRY}}',   industry)
+    .replaceAll('{{LENGTH}}',   length);
 
   promptPlainText = plain;
 
@@ -766,7 +893,8 @@ function buildAndRender() {
     e = e.replace(/\[USER_[A-Z_]+\]/g, m => `<span class="hi-placeholder">${m}</span>`);
     e = e.replace(`[${timeWindow}]`, `[<span class="hi-value">${timeWindow}</span>]`);
     e = e.replace(`[${length}]`, `[<span class="hi-value">${length}</span>]`);
-    if (industry) e = e.replace(industry, `<span class="hi-value">${industry}</span>`);
+    if (perspective && perspective !== '[USER_PERSPECTIVE_FOCUS]') e = e.replace(perspective, `<span class="hi-value">${perspective}</span>`);
+    if (industry && industry !== '[USER_INDUSTRY_FOCUS]') e = e.replace(industry, `<span class="hi-value">${industry}</span>`);
 
     return e;
   }).join('\n');
