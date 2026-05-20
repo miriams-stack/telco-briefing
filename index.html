@@ -335,10 +335,10 @@ footer { text-align: center; padding: 1.5rem; font-family: var(--mono); font-siz
       <div class="field" id="field-reading-length" style="display:none;">
         <label>Briefing-Länge <span class="req">*</span></label>
         <select id="f-reading-length">
-          <option value="3–5 minutes" selected>3–5 Minuten (Standard)</option>
+          <option value="1–2 minutes">1–2 Minuten (Sehr kurz)</option>
           <option value="2–3 minutes">2–3 Minuten (Kurz)</option>
+          <option value="3–5 minutes" selected>3–5 Minuten (Standard)</option>
           <option value="5–7 minutes">5–7 Minuten (Lang)</option>
-          <option value="7–10 minutes">7–10 Minuten (Sehr lang)</option>
         </select>
       </div>
 
@@ -811,11 +811,13 @@ OUTPUT STYLE RULES
  
 Ton: strikt informativ, sachlich, nüchtern, journalistisch klar, für schriftliche Lektüre optimiert.
  
-Struktur des Outputs:
-1. Neutrale Überschrift
-2. Datumszeile mit eindeutigem Datum
-3. Fließtext (gegliedert nach Themenblöcken)
-4. Kompakter Quellenblock am Ende
+Das Briefing folgt immer dieser festen Struktur:
+ 
+1. Kurze Einleitung (2–3 Sätze): Überblick über die wichtigsten Entwicklungen im gewählten Zeitraum.
+2. Hauptteil in Stichpunkten: Die relevantesten Meldungen als prägnante Bulletpoints — je Meldung: Was ist passiert? Wer ist betroffen? Warum relevant?
+3. Einordnung: Knappe, substanzielle Einordnung was die Entwicklungen für die angegebene Perspektive ({{PERSPECTIVE}}) bedeuten — mit Blick auf den geografischen Fokus ({{GEO}}).
+4. Offene Fragen: 2–3 Fragen die sich aus den Entwicklungen ergeben und strategisch oder operativ relevant sind.
+5. Kompakter Quellenblock am Ende.
  
 --------------------------------------------------
 TIME AND DATE RULES
@@ -832,7 +834,21 @@ OUTPUT FORMAT TEMPLATE
  
 [DATE LINE]
  
-[Briefing-Text als strukturierter Fließtext in deutscher Sprache]
+[2–3 Sätze Einleitung]
+ 
+Meldungen:
+- [Meldung 1]
+- [Meldung 2]
+- [Meldung 3]
+- [...]
+ 
+Einordnung:
+[Knappe Einordnung für {{PERSPECTIVE}} mit Fokus auf {{GEO}}]
+ 
+Offene Fragen:
+- [Frage 1]
+- [Frage 2]
+- [Frage 3]
  
 Quellen:
 - [Quelle 1]
